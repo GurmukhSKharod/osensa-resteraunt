@@ -1,7 +1,7 @@
 FROM eclipse-mosquitto:2
 
-COPY docker-entrypoint.sh /docker-entrypoint.sh
+COPY start.sh /usr/local/bin/start.sh
 
-RUN sed -i 's/\r$//' /docker-entrypoint.sh && chmod +x /docker-entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
 
-ENTRYPOINT ["/bin/sh", "/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/start.sh"]
