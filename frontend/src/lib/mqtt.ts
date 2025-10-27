@@ -34,16 +34,26 @@ export function getClient(): MqttClient {
 
   client.on('message', (_topic, payload) => {
     try {
-      const evt = JSON.parse(payload.toString()) as FoodEvent
-      if (evt?.status === 'ready') {
+        // Robustly decode Buffer | Uint8Array | string
+        const text =
+        typeof payload === 'string'
+            ? payload
+            : payload instanceof Uint8Array
+            ? new TextDecoder().decode(payload)
+            : (payload as any)?.toString?.() ?? String(payload)
+
+        const evt = JSON.parse(text) as FoodEvent
+
+        if (evt?.status === 'ready') {
         markReady(evt)
-      } else if (evt?.status === 'error') {
+        } else if (evt?.status === 'error') {
         markError(evt)
-      }
+        }
     } catch (e) {
-      console.error('Bad payload from MQTT:', e)
+        console.error('Bad payload from MQTT:', e)
     }
-  })
+ })
+
 
   client.on('error', (err) => console.error('MQTT error', err))
   return client
@@ -52,4 +62,10 @@ export function getClient(): MqttClient {
 export function publishOrder(order: Order) {
   const c = getClient()
   c.publish(`restaurant/orders/${order.table}`, JSON.stringify(order), { qos: 1 })
+}
+
+
+// helper to reset the singleton client between tests
+export function __resetClientForTests() {
+  client = null
 }
