@@ -1,19 +1,17 @@
-# backend/Dockerfile
 FROM python:3.11-slim
-
 WORKDIR /app
 
-# 1) deps
+# deps
 COPY backend/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# 2) code
-COPY backend/web_service.py /app/backend/web_service.py
-COPY backend/__init__.py /app/backend/__init__.py
-COPY backend/src /app/src
+# code
+COPY backend /app/backend
 
 # make kitchen.* importable
-ENV PYTHONPATH=/app/src
+ENV PYTHONPATH=/app/backend/src
+ENV PYTHONUNBUFFERED=1
+ENV PORT=8000
 
-# Run the tiny health HTTP server and start the MQTT worker in a thread
-CMD ["python", "/app/backend/web_service.py"]
+# start the tiny HTTP server that also launches the worker
+CMD ["python", "/app/backend/app.py"]
