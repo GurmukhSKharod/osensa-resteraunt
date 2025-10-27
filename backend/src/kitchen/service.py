@@ -19,7 +19,7 @@ import socket
 from dataclasses import dataclass
 from typing import Callable, Awaitable, Optional
 from urllib.parse import urlparse
-
+import ssl
 import paho.mqtt.client as mqtt  
 
 from . import config
@@ -120,6 +120,18 @@ class MqttService:
 
         # Set WS path 
         self.client.ws_set_options(path=self.ws.path)
+
+        if os.getenv("MQTT_URL", "").startswith("wss://"):
+            # Default CA bundle in the python:3.11-slim image is fine
+            self.client.tls_set(
+                ca_certs=None,                 # use system CAs
+                certfile=None,
+                keyfile=None,
+                cert_reqs=ssl.CERT_REQUIRED,
+                tls_version=ssl.PROTOCOL_TLS,  # let OpenSSL pick the best
+                ciphers=None,
+            )
+            self.client.tls_insecure_set(False)
 
         # Backoff reconnect in our loop if needed
         self._stop = asyncio.Event()
