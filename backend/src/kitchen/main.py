@@ -5,6 +5,7 @@ Main for running the backend locally + deployed demo.
 import asyncio
 import logging
 import os
+from .health import run_health_server
 
 from .service import MqttService
 
@@ -13,6 +14,10 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 
 
 def main() -> None:
+    
+    # start HTTP health server for Render
+    asyncio.create_task(run_health_server())
+
     ws_url = os.getenv("MQTT_URL", "ws://localhost:8083/mqtt")
 
     loop = asyncio.new_event_loop()
