@@ -16,6 +16,7 @@ A 4-table one-page interface: click ORDER, type a food (free text), and it appea
 5. Frontend updates the table list.
 
 Note: If error then it shows up below in global errors section.
+
 Note: While food is preparing it is shown below as well.
 
 Component files:
