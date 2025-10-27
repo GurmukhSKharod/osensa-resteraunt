@@ -1,13 +1,20 @@
-﻿node_modules/
-dist/
+﻿# Python
+.venv/
+venv/
+env/
+**/__pycache__/
+*.pyc
+
+# Node
+node_modules/
+frontend/dist/
+
+# Docker volumes (local only)
+mosquitto_data/
+mosquitto_log/
+
+# Misc
 .env
 .env.*
 .vscode/
 .DS_Store
-__pycache__/
-*.pyc
-.mypy_cache/
-.build/
-coverage/
-mosquitto_data/
-mosquitto_log/
