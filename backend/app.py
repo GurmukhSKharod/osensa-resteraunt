@@ -4,8 +4,8 @@ import os
 import threading
 import logging
 
-from src.kitchen.health import run_health_server
-from src.kitchen.service import MqttService
+from kitchen.health import run_health_server
+from kitchen.service import MqttService
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
