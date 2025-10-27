@@ -1,55 +1,35 @@
-# backend/web_service.py
-# expose a minimal HTTP /health endpoint 
-# so Render can host this as a Web Service,
-# and start your existing MQTT worker in the background.
-
+# backend/app.py
+import asyncio
 import os
-import json
 import threading
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import logging
 
-# Import your existing blocking worker entrypoint
-from kitchen.main import main as kitchen_main
+from src.kitchen.health import run_health_server
+from src.kitchen.service import MqttService
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
-class HealthHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == "/health":
-            body = json.dumps({"ok": True}).encode("utf-8")
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
-        else:
-            self.send_response(404)
-            self.end_headers()
+def _health_thread():
+    asyncio.run(run_health_server())
 
-    # keep logs quiet
-    def log_message(self, fmt, *args):
-        return
+def main() -> None:
+    threading.Thread(target=_health_thread, daemon=True).start()
 
+    ws_url = os.getenv("MQTT_URL", "ws://localhost:8083/mqtt")
 
-def start_worker_once():
-    # Start your MQTT worker in a background daemon thread.
-    # kitchen_main() should block forever.
-    t = threading.Thread(target=kitchen_main, daemon=True)
-    t.start()
-    return t
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
 
-
-def main():
-    # Render injects $PORT. Default locally if missing.
-    port = int(os.environ.get("PORT", "8000"))
-
-    # Start the MQTT worker
-    start_worker_once()
-
-    # Start the HTTP health server
-    server = ThreadingHTTPServer(("0.0.0.0", port), HealthHandler)
-    print(f"[backend] Health server on :{port} (GET /health)")
-    server.serve_forever()
-
+    svc = MqttService(ws_url, loop=loop)
+    try:
+        loop.run_until_complete(svc.run())
+    except KeyboardInterrupt:
+        pass
+    finally:
+        svc.stop()
+        loop.run_until_complete(asyncio.sleep(0.1))
+        loop.stop()
+        loop.close()
 
 if __name__ == "__main__":
     main()
