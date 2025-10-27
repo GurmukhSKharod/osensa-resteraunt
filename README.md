@@ -104,50 +104,6 @@ Open the printed URL (usually http://localhost:5173).
 
 ---
 
-# Directory Structure
-```
-osensa-restaurant/
-- broker/
-  - mosquitto.conf
-  - mosquitto.prod.conf
-  - Dockerfile (optional for prod broker)
-- backend/
-  - Dockerfile
-  - requirements.txt
-  - pytest.ini
-  - src/kitchen/
-    - __init__.py
-    - config.py
-    - domain.py
-    - service.py
-    - main.py
-  - tests/
-    - test_domain.py
-    - test_service_concurrency.py
-- frontend/
-  - netlify.toml
-  - index.html
-  - package.json
-  - tsconfig.json
-  - vite.config.ts
-  - src/
-    - app.css
-    - main.ts
-    - App.svelte
-    - lib/
-      - mqtt.ts
-      - store.ts
-      - types.ts
-      - __tests__/
-        - mqtt.spec.ts
-        - store.spec.ts
-- docker-compose.yml
-- .gitignore
-- README.md
-```
-
----
-
 # Running Tests
 
 Backend:
