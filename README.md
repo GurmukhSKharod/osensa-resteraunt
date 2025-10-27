@@ -54,8 +54,6 @@ Svelte 5 + Vite + TypeScript + mqtt.js.
 
 ## Broker
 Eclipse Mosquitto (MQTT over WebSockets).
-- Dev: anonymous allowed on ws://localhost:8083/mqtt.
-- Prod: WSS + username/password.
 
 ## Tests
 - Backend: pytest.
