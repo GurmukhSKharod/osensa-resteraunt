@@ -108,33 +108,19 @@ class MqttService:
     def __init__(self, ws_url: str, loop: asyncio.AbstractEventLoop):
         self.ws = parse_ws_url(ws_url)
         self.loop = loop
-        self.client = mqtt.Client(transport="websockets")  # WS transport
-        self.client.enable_logger()  # pipe basic logs to stdlib logging
 
-        # Events come in on this queue (populated from paho callbacks)
-        self.queue: asyncio.Queue[tuple[str, bytes]] = asyncio.Queue()
+        self.client = mqtt.Client(client_id="backend-kitchen", transport="websockets")
 
-        # Wire callbacks
-        self.client.on_connect = self._on_connect
-        self.client.on_message = self._on_message
+      
+        if ws_url.startswith("wss://"):
+            self.client.tls_set()  # use system CA bundle
 
-        # Set WS path 
         self.client.ws_set_options(path=self.ws.path)
 
-        if os.getenv("MQTT_URL", "").startswith("wss://"):
-            # Default CA bundle in the python:3.11-slim image is fine
-            self.client.tls_set(
-                ca_certs=None,                 # use system CAs
-                certfile=None,
-                keyfile=None,
-                cert_reqs=ssl.CERT_REQUIRED,
-                tls_version=ssl.PROTOCOL_TLS,  # let OpenSSL pick the best
-                ciphers=None,
-            )
-            self.client.tls_insecure_set(False)
-
-        # Backoff reconnect in our loop if needed
-        self._stop = asyncio.Event()
+        self.client.enable_logger()
+        self.queue = asyncio.Queue()
+        self.client.on_connect = self._on_connect
+        self.client.on_message = self._on_message
 
     # paho callbacks (run in its thread)
     def _on_connect(self, client, userdata, flags, rc):
