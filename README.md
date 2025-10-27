@@ -14,6 +14,7 @@ A 4-table one-page interface: click ORDER, type a food (free text), and it appea
 3. Backend validates + waits random 0.8–4s 
 4. Backend publishes FOOD 
 5. Frontend updates the table list.
+
 Note: If error then it shows up below in global errors section.
 Note: While food is preparing it is shown below as well.
 
