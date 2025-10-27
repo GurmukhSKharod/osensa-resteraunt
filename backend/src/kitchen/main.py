@@ -14,14 +14,14 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 
 
 def main() -> None:
-    
-    # start HTTP health server for Render
-    asyncio.create_task(run_health_server())
 
     ws_url = os.getenv("MQTT_URL", "ws://localhost:8083/mqtt")
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
+
+    # start HTTP health server for Render
+    asyncio.create_task(run_health_server())
 
     svc = MqttService(ws_url, loop=loop)
 
