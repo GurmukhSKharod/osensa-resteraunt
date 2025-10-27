@@ -1,3 +1,4 @@
+#!/usr/bin/env sh
 set -eu
 
 PORT="${PORT:-8083}"
