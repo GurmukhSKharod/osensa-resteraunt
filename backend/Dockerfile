@@ -1,17 +1,21 @@
 FROM python:3.11-slim
+
 WORKDIR /app
+
+# --- add CA certs so wss:// works ---
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+ && update-ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 
 # deps
 COPY backend/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # code
-COPY backend /app/backend
+COPY backend/app.py /app/backend/app.py
+COPY backend/__init__.py /app/backend/__init__.py
+COPY backend/src /app/src
 
-# make kitchen.* importable
-ENV PYTHONPATH=/app/backend/src
-ENV PYTHONUNBUFFERED=1
-ENV PORT=8000
+ENV PYTHONPATH=/app/src
 
-# start the tiny HTTP server that also launches the worker
 CMD ["python", "/app/backend/app.py"]
