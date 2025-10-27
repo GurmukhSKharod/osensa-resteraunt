@@ -3,6 +3,13 @@ set -eu
 
 PORT="${PORT:-8083}"
 
+# Ensure paths exist
+mkdir -p /mosquitto/config
+mkdir -p /mosquitto/data
+mkdir -p /mosquitto/www    
+
+echo "<h1>Mosquitto WebSockets</h1>" > /mosquitto/www/index.html
+
 cat >/mosquitto/config/mosquitto.conf <<EOF
 persistence true
 persistence_location /mosquitto/data/
