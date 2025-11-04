@@ -9,7 +9,7 @@ export async function wakeBackend(
 
   const pingOnce = () =>
     fetch(target, { method: "GET", mode: "no-cors", cache: "no-store" })
-      .catch(() => { /* ignore – we just need to send it */ });
+      .catch(() => {});
 
   await pingOnce();
   for (let i = 1; i < attempts; i++) {
