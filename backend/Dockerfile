@@ -16,6 +16,6 @@ COPY backend/app.py /app/backend/app.py
 COPY backend/__init__.py /app/backend/__init__.py
 COPY backend/src /app/src
 
-ENV PYTHONPATH=/app/src
+ENV PYTHONPATH=/app
 
 CMD ["python", "/app/backend/app.py"]
