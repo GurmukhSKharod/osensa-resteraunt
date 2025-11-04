@@ -1,15 +1,27 @@
 <script lang="ts">
-  import { TABLE_COUNT, inFlight, tableFood, errors } from './lib/store'
-  import { publishOrder } from './lib/mqtt'
+  import { onMount } from 'svelte';
+  import { TABLE_COUNT, inFlight, tableFood, errors } from './lib/store';
+  import { publishOrder } from './lib/mqtt';
+  import { wakeBackend } from './lib/wakeBackend';
 
-  function askFood(table: number) {
-    const food = prompt(`Enter food name for table ${table}`)
-    if (!food || !food.trim()) return
-    const order = { orderId: crypto.randomUUID(), table, food: food.trim(), ts: Date.now() }
-    inFlight.update(v => ({ ...v, [order.orderId]: order }))
-    publishOrder(order)
+  // Nudge backend as soon as the UI loads
+  onMount(() => {
+    wakeBackend();
+  });
+
+  async function askFood(table: number) {
+    const food = prompt(`Enter food name for table ${table}`);
+    if (!food || !food.trim()) return;
+
+    // Nudge again right before first meaningful action
+    await wakeBackend();
+
+    const order = { orderId: crypto.randomUUID(), table, food: food.trim(), ts: Date.now() };
+    inFlight.update(v => ({ ...v, [order.orderId]: order }));
+    publishOrder(order);
   }
 </script>
+
 
 <h1>OSENSA Restaurant</h1>
 <p>Click ORDER, type a food, and it will appear when ready. Errors show below each table.</p>
