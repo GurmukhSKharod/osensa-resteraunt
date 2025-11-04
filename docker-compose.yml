@@ -1,17 +1,11 @@
 ﻿version: "3.9"
 services:
   broker:
-    image: eclipse-mosquitto:2
+    build: ./broker
     container_name: osensa-mosquitto
+    environment:
+      - PORT=8083
     ports:
       - "1883:1883"
       - "8083:8083"
-    volumes:
-      - ./broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
-      - mosquitto_data:/mosquitto/data
-      - mosquitto_log:/mosquitto/log
     restart: unless-stopped
-
-volumes:
-  mosquitto_data:
-  mosquitto_log:
