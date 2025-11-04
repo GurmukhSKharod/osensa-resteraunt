@@ -51,7 +51,7 @@ def parse_ws_url(url: str) -> WsEndpoint:
     if u.scheme not in ("ws", "wss"):
         raise ValueError("MQTT_URL must start with ws:// or wss://")
     port = u.port or (443 if u.scheme == "wss" else 80)
-    path = u.path or "/mqtt"
+    path = u.path or "/"
     return WsEndpoint(host=u.hostname or "localhost", port=port, path=path, secure=(u.scheme == "wss"))
 
 
