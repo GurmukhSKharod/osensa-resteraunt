@@ -1,6 +1,6 @@
 export async function wakeBackend(
   url?: string,
-  { attempts = 3, delayMs = 1200 } = {}
+  { attempts = 3, delayMs = 100 } = {}
 ) {
   const target =
     url ??
