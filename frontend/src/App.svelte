@@ -1,26 +1,25 @@
+<!-- src/App.svelte -->
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { TABLE_COUNT, inFlight, tableFood, errors } from './lib/store';
-  import { publishOrder } from './lib/mqtt';
   import { wakeBackend } from './lib/wakeBackend';
+  import { TABLE_COUNT, inFlight, tableFood, errors } from './lib/store';
+  import { publishOrder, ensureMqttReady } from './lib/mqtt';
 
-  // Nudge backend as soon as the UI loads
   onMount(() => {
-    wakeBackend();
+    wakeBackend();           // don't await
+    ensureMqttReady();       // see section 2
   });
 
-  async function askFood(table: number) {
+  function askFood(table: number) {
     const food = prompt(`Enter food name for table ${table}`);
     if (!food || !food.trim()) return;
 
-    // Nudge again right before first meaningful action
-    await wakeBackend();
-
     const order = { orderId: crypto.randomUUID(), table, food: food.trim(), ts: Date.now() };
-    inFlight.update(v => ({ ...v, [order.orderId]: order }));
-    publishOrder(order);
+    inFlight.update(v => ({ ...v, [order.orderId]: order }));  // instant UI update
+    publishOrder(order);                                       // publishes via a live client
   }
 </script>
+
 
 
 <h1>OSENSA Restaurant</h1>
