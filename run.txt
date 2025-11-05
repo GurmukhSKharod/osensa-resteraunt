@@ -1,0 +1,31 @@
+cd backend
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+
+# Tell backend where the broker is (WebSockets URL)
+$env:MQTT_URL = "ws://localhost:8083/mqtt"
+
+python .\app.py
+
+pytest -q
+
+
+
+
+docker compose up -d --build     
+
+
+
+
+cd frontend
+
+# not needed
+# Dev env vars (create .env.local)
+@"
+VITE_MQTT_URL=ws://localhost:8083/mqtt
+VITE_BACKEND_HEALTH_URL=http://localhost:8080/health
+"@ | Out-File -Encoding utf8 .env.local
+
+npm ci
+npm run dev

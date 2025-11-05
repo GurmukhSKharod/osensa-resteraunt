@@ -9,12 +9,18 @@
     wakeBackend();
   });
 
+  // Called when you click ORDER for a table - createsorder, adds it to inFlight, publishes to broker
   async function askFood(table: number) {
     const food = prompt(`Enter food name for table ${table}`);
     if (!food || !food.trim()) return;
 
+    // Make an order object with a unique ID and timestamp.
     const order = { orderId: crypto.randomUUID(), table, food: food.trim(), ts: Date.now() };
+    
+    // Put this order into the "inFlight" store so the UI shows "preparing…".
     inFlight.update(v => ({ ...v, [order.orderId]: order }));
+    
+    // Send the order to the backend via MQTT publish.
     publishOrder(order);
   }
 </script>

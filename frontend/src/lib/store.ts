@@ -9,16 +9,20 @@ import type { Order, FoodEvent } from './types'
 
 export const TABLE_COUNT = 4
 
+// tableFood: for each table number, a list of strings like "pizza (ready, 2700ms)"
 export const tableFood: Writable<Record<number, string[]>> = writable(
   Object.fromEntries(Array.from({ length: TABLE_COUNT }, (_, i) => [i + 1, []]))
 )
 
+// errors: per table list of error strings; table 0 is “global/unknown table”
 export const errors: Writable<Record<number, string[]>> = writable(
   Object.fromEntries([[0, []], ...Array.from({ length: TABLE_COUNT }, (_, i) => [i + 1, []])])
 )
 
+// inFlight: orders we have sent but are not ready yet keyed by orderId
 export const inFlight: Writable<Record<string, Order>> = writable({})
 
+// When backend says a food is ready, add it and remove from inFlight
 export function markReady(evt: FoodEvent) {
   tableFood.update((m) => {
     const line = `${evt.food} (${evt.status}${evt.prepMs ? `, ${evt.prepMs}ms` : ''})`
@@ -32,6 +36,7 @@ export function markReady(evt: FoodEvent) {
   })
 }
 
+// When backend sends an error (bad table, validation, etc.)
 export function markError(evt: FoodEvent) {
   // Unknown/invalid table from backend uses 0
   const t = evt.table && evt.table > 0 ? evt.table : 0
